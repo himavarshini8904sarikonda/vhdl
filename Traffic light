@@ -1,0 +1,58 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+entity traffic_light_controller is
+    Port ( clk : in STD_LOGIC;
+           reset : in STD_LOGIC;
+           red_led : out STD_LOGIC;
+           yellow_led : out STD_LOGIC;
+           green_led : out STD_LOGIC);
+end traffic_light_controller;
+
+architecture Behavioral of traffic_light_controller is
+    type state_type is (red, red_yellow, green, yellow); -- Define possible states
+    signal current_state, next_state : state_type := red; -- Initialize current and next state
+
+begin
+    process(clk, reset)
+    begin
+        if reset = '1' then
+            current_state <= red; -- Reset to initial state
+        elsif rising_edge(clk) then
+            current_state <= next_state; -- Update current state
+        end if;
+    end process;
+
+    process(current_state)
+    begin
+        case current_state is
+            when red =>
+                red_led <= '1';
+                yellow_led <= '0';
+                green_led <= '0';
+                next_state <= red_yellow;
+            when red_yellow =>
+                red_led <= '1';
+                yellow_led <= '1';
+                green_led <= '0';
+                next_state <= green;
+            when green =>
+                red_led <= '0';
+                yellow_led <= '0';
+                green_led <= '1';
+                next_state <= yellow;
+            when yellow =>
+                red_led <= '0';
+                yellow_led <= '1';
+                green_led <= '0';
+                next_state <= red;
+            when others => -- This should never happen
+                red_led <= '0';
+                yellow_led <= '0';
+                green_led <= '0';
+                next_state <= red;
+        end case;
+    end process;
+end Behavioral;
